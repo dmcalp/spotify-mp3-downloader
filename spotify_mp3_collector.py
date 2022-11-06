@@ -7,7 +7,6 @@ from decouple import config
 
 
 def spotify_auth():
-    print('Creating client')
     oauth = SpotifyOAuth(client_id=config('CLIENT_ID'),
                          client_secret=config('CLIENT_SECRET'),
                          scope=config('SCOPE'),
@@ -19,8 +18,6 @@ def spotify_auth():
 
 
 def get_saved_tracknames(sp, desired_amount=10, offset=0):
-
-    # collect all pages of results from api
     print(f'Collecting your recent saved tracks from spotify')
     spotify_results = sp.current_user_saved_tracks(offset=offset)
     all_track_results = spotify_results['items']
@@ -58,7 +55,7 @@ def fetch_URLS_from_tracknames(tracks):
     return url_list
 
 
-def download_mp3_from_urls(urls, amount=10):
+def download_mp3_from_urls(urls):
     output_path = os.path.join(os.getcwd(), "Songs")
     try:
         os.mkdir(output_path)
@@ -76,16 +73,16 @@ def download_mp3_from_urls(urls, amount=10):
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download(urls[:amount])
+        ydl.download(urls)
 
     print('Finished')
 
 
-number_of_songs = 20
+number_of_songs = 2
 offset = 0
 
 client = spotify_auth()
 tracks = get_saved_tracknames(
     client, desired_amount=number_of_songs, offset=offset)
 urls = fetch_URLS_from_tracknames(tracks)
-download_mp3_from_urls(urls, amount=number_of_songs)
+download_mp3_from_urls(urls)
